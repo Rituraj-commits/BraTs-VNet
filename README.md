@@ -19,10 +19,10 @@ We use Volumetric Network(V-Net) which is a 3D Fully Convolutional Network(FCN) 
 
 ### Installing
 
-1. ```
+```
  pip install SimpleITK
 ```
-2. ```
+```
  pip install tensorboard
 ```
 
