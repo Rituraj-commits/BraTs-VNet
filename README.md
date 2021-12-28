@@ -9,6 +9,9 @@ Expert annotations are provided in the form of segmentation masks to detect 3 cl
 We use Volumetric Network(V-Net) which is a 3D Fully Convolutional Network(FCN) for segmentation of 3D medical images. We use Dice Loss as the objective function for the present scenario. Future implementation will include Hausdorff Loss for better boundary segmentations.
 
 ## Getting Started
+### Dataset
+#### 4D Multimodal MRI dataset 
+The dataset contains 750 4D volumes of MRI scans(484 for training and 266 for testing). Since the test set is not publicly available we split the train set into train-val-split. We use for 400 scans for training and validation and the rest 84 for evaluation. No data augmentations are applied to the data. The data is stored in NIfTI file format(.nii.gz). A 4D tensor of shape (4,150,240,240) is obtained after reading the data where the 1st dimension denotes the modility(Flair,T1w,t1gd,T2w), 2nd dimension denotes the number of slices and the 3rd and 4th dimesion denotes the width and height respectively. We crop each modality to (64,64,64) for computational purpose and stack each modality along the 0th axis.
 
 ### Dependencies
 
