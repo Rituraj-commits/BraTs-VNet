@@ -37,7 +37,6 @@ We use Adam optimizer for optimizing the objective function. The learning rate i
 
 #### Evaluation
 We evaluate the model on the basis of Dice Score Coefficient(DSC).
-https://github.com/Rituraj-commits/BraTs-VNet/blob/main/figs/sort.png
 <div align="center">
   <img src="https://github.com/Rituraj-commits/BraTs-VNet/blob/main/figs/sort.png">
   <br>
