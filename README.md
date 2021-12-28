@@ -19,14 +19,13 @@ We use Volumetric Network(V-Net) which is a 3D Fully Convolutional Network(FCN) 
 
 ### Installing
 
-* The 
-* Any modifications needed to be made to files/folders
-
-### Executing program
-
 ```
 * pip install SimpleITK
 ```
+
+### Executing program
+
+
 ```
 * python train.py
 ```
