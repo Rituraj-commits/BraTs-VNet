@@ -1,0 +1,40 @@
+# BraTS(Brain Tumour Segmentation) using V-Net
+
+This project is an approach to detect brain tumours using BraTS 2016,2017 dataset.
+
+## Description
+
+BraTS is a dataset which provides multimodal 3D brain MRIs annotated by experts. Each Magnetic Resonance Imaging(MRI) scan consists of 4 different modalities(Flair,T1w,t1gd,T2w).
+Expert annotations are provided in the form of segmentation masks to detect 3 classes of tumour- ED,ET,NET/NCR. The dataset is challening in terms of the complex and heterogeneously-located targets.
+We use Volumetric Network(V-Net) which is a 3D Fully Convolutional Network(FCN) for segmentation of 3D medical images. We use Dice Loss as the objective function for the present scenario. Future implementation will include Hausdorff Loss for better boundary segmentations.
+
+## Getting Started
+
+### Dependencies
+
+* SimpleITK
+* Pytorch 1.8.0
+* CUDA 10.2
+* tensorboard 2.5.0
+
+### Installing
+
+* The 
+* Any modifications needed to be made to files/folders
+
+### Executing program
+
+* How to run the program
+* Step-by-step bullets
+```
+* pip install SimpleITK
+```
+```
+* python train.py
+```
+
+## Acknowledgments
+
+Inspiration, code snippets, etc.
+* [BraTS 3D UNet](https://www.kaggle.com/polomarco/brats20-3dunet-3dautoencoder)
+* [VNet](https://github.com/black0017/MedicalZooPytorch)
