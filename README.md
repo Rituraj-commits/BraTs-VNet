@@ -24,8 +24,13 @@ The dataset contains 750 4D volumes of MRI scans(484 for training and 266 for te
 ### Experimental Details
 #### Loss functions
 We use Dice loss as the objective function to train the model.
-
-<img src="https://render.githubusercontent.com/render/math?math=\mathcal{L}_{DL} = 1- 2 \frac{\sum (Y_q^t \circ \hat{Y}_q^t)}{\sum ((Y_q^t)^2 + (\hat{Y}_q^t))^2}">
+<div align="center">
+  <img src="https://github.com/Rituraj-commits/BraTs-VNet/blob/main/figs/formula1.png">
+  <br>
+  <br>
+  <em align="center"></em>
+  <br>
+</div>
 
 #### Training
 We use Adam optimizer for optimizing the objective function. The learning rate is initially set to 0.001 and halved after every 50 epochs. We train the network until 300 epochs and the best weights are saved accordingly.
