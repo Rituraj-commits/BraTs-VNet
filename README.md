@@ -20,14 +20,17 @@ We use Volumetric Network(V-Net) which is a 3D Fully Convolutional Network(FCN) 
 ### Installing
 
 ```
-* pip install SimpleITK
+ pip install SimpleITK
+```
+```
+ pip install tensorboard
 ```
 
 ### Executing program
 
 
 ```
-* python train.py
+ python train.py
 ```
 
 ## Acknowledgments
