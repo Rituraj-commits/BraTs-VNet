@@ -4,7 +4,7 @@ This project is an approach to detect brain tumours using BraTS 2016,2017 datase
 
 ## Description
 
-BraTS is a dataset which provides multimodal 3D brain MRIs annotated by experts. Each Magnetic Resonance Imaging(MRI) scan consists of 4 different modalities(Flair,T1w,t1gd,T2w).
+[BraTS](http://medicaldecathlon.com/) is a dataset which provides multimodal 3D brain MRIs annotated by experts. Each Magnetic Resonance Imaging(MRI) scan consists of 4 different modalities(Flair,T1w,t1gd,T2w).
 Expert annotations are provided in the form of segmentation masks to detect 3 classes of tumour - edema(ED),enhancing tumour(ET),necrotic and non-enhancing tumour(NET/NCR). The dataset is challening in terms of the complex and heterogeneously-located targets.
 We use Volumetric Network(V-Net) which is a 3D Fully Convolutional Network(FCN) for segmentation of 3D medical images. We use Dice Loss as the objective function for the present scenario. Future implementation will include Hausdorff Loss for better boundary segmentations.
 
@@ -69,6 +69,5 @@ We evaluate the model on the basis of Dice Score Coefficient(DSC).
 
 ## Acknowledgments
 
-* [BraTS](http://medicaldecathlon.com/)
 * [BraTS 3D UNet](https://www.kaggle.com/polomarco/brats20-3dunet-3dautoencoder)
 * [VNet](https://github.com/black0017/MedicalZooPytorch)
