@@ -37,7 +37,13 @@ We use Adam optimizer for optimizing the objective function. The learning rate i
 
 #### Evaluation
 We evaluate the model on the basis of Dice Score Coefficient(DSC).
-
+<div align="center">
+  <img src="https://www.google.com/search?q=dice+score+coefficient&client=ubuntu&hs=TIL&channel=fs&sxsrf=AOaemvKIGQ_FvXsm6UOqGWPWTwIjpAYIBA:1640717118590&source=lnms&tbm=isch&sa=X&ved=2ahUKEwjP0J7Ik4f1AhVOxYsBHTB8ChgQ_AUoAXoECAIQAw&biw=1600&bih=793&dpr=1.2#imgrc=6QRUGmXAMEPpnM">
+  <br>
+  <br>
+  <em align="center">Fig 1: Brain Tumour Segmentation </em>
+  <br>
+</div>
 
 ### Dependencies
 
