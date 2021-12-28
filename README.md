@@ -12,7 +12,7 @@ We use Volumetric Network(V-Net) which is a 3D Fully Convolutional Network(FCN) 
 
 ### Dependencies
 
-* SimpleITK
+* SimpleITK 2.0.2
 * Pytorch 1.8.0
 * CUDA 10.2
 * tensorboard 2.5.0
