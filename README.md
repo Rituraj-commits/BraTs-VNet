@@ -32,7 +32,9 @@ We use Volumetric Network(V-Net) which is a 3D Fully Convolutional Network(FCN) 
 ```python
  python train.py
 ```
-
+```train.py``` contains code for training the model and saving the weights.
+```loader.py``` contains code for dataloading and train-test split.
+```utils.py``` contains utility functions.
 
 ## Acknowledgments
 
