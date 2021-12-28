@@ -33,6 +33,5 @@ We use Volumetric Network(V-Net) which is a 3D Fully Convolutional Network(FCN) 
 
 ## Acknowledgments
 
-Inspiration, code snippets, etc.
 * [BraTS 3D UNet](https://www.kaggle.com/polomarco/brats20-3dunet-3dautoencoder)
 * [VNet](https://github.com/black0017/MedicalZooPytorch)
