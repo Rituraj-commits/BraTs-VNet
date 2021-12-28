@@ -11,7 +11,19 @@ We use Volumetric Network(V-Net) which is a 3D Fully Convolutional Network(FCN) 
 ## Getting Started
 ### Dataset
 #### 4D Multimodal MRI dataset 
-The dataset contains 750 4D volumes of MRI scans(484 for training and 266 for testing). Since the test set is not publicly available we split the train set into train-val-split. We use for 400 scans for training and validation and the rest 84 for evaluation. No data augmentations are applied to the data. The data is stored in NIfTI file format(.nii.gz). A 4D tensor of shape (4,150,240,240) is obtained after reading the data where the 1st dimension denotes the modility(Flair,T1w,t1gd,T2w), 2nd dimension denotes the number of slices and the 3rd and 4th dimesion denotes the width and height respectively. We crop each modality to (64,64,64) for computational purpose and stack each modality along the 0th axis.
+The dataset contains 750 4D volumes of MRI scans(484 for training and 266 for testing). Since the test set is not publicly available we split the train set into train-val-split. We use for 400 scans for training and validation and the rest 84 for evaluation. No data augmentations are applied to the data. The data is stored in NIfTI file format(.nii.gz). A 4D tensor of shape (4,150,240,240) is obtained after reading the data where the 1st dimension denotes the modility(Flair,T1w,t1gd,T2w), 2nd dimension denotes the number of slices and the 3rd and 4th dimesion denotes the width and height respectively. We crop each modality to (64,64,64) for computational purpose and stack each modality along the 0th axis. The segmentation masks contain 3 clasees - ED,ET,NET/NCR. We resize and stack each class to form a tensor of shape (3,64,64,64).
+
+### Experimental Details
+#### Loss functions
+We use Dice loss as the objective function to train the model.
+<img src="https://render.githubusercontent.com/render/math?math=\mathcal{L}_{DL} = 1- 2 \frac{\sum (Y_q^t \circ \hat{Y}_q^t)}{\sum ((Y_q^t)^2 + (\hat{Y}_q^t))^2}">
+
+#### Training
+We use Adam optimizer for optimizing the objective function. The learning rate is initially set to 0.001 and halved after every 50 epochs. We train the network until 300 epochs and the best weights are saved accordingly.
+
+#### Evaluation
+We evaluate the model on the basis of Dice Score Coefficient(DSC).
+
 
 ### Dependencies
 
@@ -43,5 +55,6 @@ The dataset contains 750 4D volumes of MRI scans(484 for training and 266 for te
 
 ## Acknowledgments
 
+* [BraTS](http://medicaldecathlon.com/)
 * [BraTS 3D UNet](https://www.kaggle.com/polomarco/brats20-3dunet-3dautoencoder)
 * [VNet](https://github.com/black0017/MedicalZooPytorch)
