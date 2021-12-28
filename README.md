@@ -24,8 +24,6 @@ We use Volumetric Network(V-Net) which is a 3D Fully Convolutional Network(FCN) 
 
 ### Executing program
 
-* How to run the program
-* Step-by-step bullets
 ```
 * pip install SimpleITK
 ```
