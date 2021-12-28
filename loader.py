@@ -2,7 +2,8 @@ import numpy as np
 import SimpleITK as sitk
 import os
 from torch.utils import data
-from torch.utils.data import Dataset, DataLoader
+from torch.utils.data import Dataset, DataLoader, dataset
+from torch.utils.data.sampler import SubsetRandomSampler
 import json
 
 class BratsDataset(Dataset):
@@ -64,6 +65,7 @@ class BratsDataset(Dataset):
             mask_path = self.dataset_path+self.mode+'/'+label_test[index]
         mask = self.load_image(mask_path)
         mask = self.resize_image(mask, self.crop_dim,mode='symmetric')
+        mask = np.clip(mask, 0, 1)
         mask_WT = mask.copy()
         mask_WT[mask_WT == 1] = 1
         mask_WT[mask_WT == 2] = 1
@@ -80,7 +82,6 @@ class BratsDataset(Dataset):
         mask_ET[mask_ET == 4] = 1
 
         mask = np.stack([mask_WT, mask_TC, mask_ET]).astype(np.float32)
-        mask = np.moveaxis(mask, (0, 1, 2, 3), (0, 3, 2, 1))
 
         return img,mask
 
@@ -118,3 +119,4 @@ class BratsDataset(Dataset):
             slicer[i] = slice(from_indices[i][0], from_indices[i][1])
 
         return np.pad(image[slicer], to_padding, **kwargs)
+

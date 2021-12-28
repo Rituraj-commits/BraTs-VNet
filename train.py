@@ -1,4 +1,3 @@
-from torch.utils.data import sampler
 from vnet import *
 from loader import *
 from config import *
@@ -14,6 +13,9 @@ from torch.autograd import Variable
 from torch.optim.lr_scheduler import StepLR
 from torch.utils.tensorboard import SummaryWriter
 from torch.utils.data.sampler import SubsetRandomSampler
+
+import warnings
+warnings.filterwarnings("ignore")
 
 def weights_init(m):
     classname = m.__class__.__name__
@@ -36,9 +38,9 @@ def main():
     train_sampler = SubsetRandomSampler(train_idx)
     valid_sampler = SubsetRandomSampler(valid_idx)
     
-    train_loader = DataLoader(train_dataset, batch_size=args.batch_size, num_workers=4,sampler=train_sampler)
-    val_loader = DataLoader(train_dataset, batch_size=args.batch_size, num_workers=4,sampler=valid_sampler)
-    test_loader = DataLoader(test_dataset, batch_size=args.batch_size, shuffle=True, num_workers=4)
+    train_loader = DataLoader(train_dataset, batch_size=args.batch_size, num_workers=2,sampler=train_sampler)
+    val_loader = DataLoader(train_dataset, batch_size=args.batch_size, num_workers=2,sampler=valid_sampler)
+    test_loader = DataLoader(test_dataset, batch_size=args.batch_size, shuffle=True, num_workers=2)
 
     if args.optimizer == 'adam':
         optimizer = optim.Adam(model.parameters(), lr=args.learning_rate)
@@ -46,9 +48,9 @@ def main():
     elif args.optimizer == 'sgd':
         optimizer = optim.SGD(model.parameters(), lr=args.learning_rate, momentum=0.9)
 
-    criterion = GeneralizedDiceLoss(classes=3)
+    criterion = DiceLoss()
     criterion.cuda()
-    best_model = 0.0
+    best_model = 1.0
     tb = SummaryWriter()
 
     print('Start Training')
@@ -59,7 +61,7 @@ def main():
             inputs, labels = data
             inputs, labels = Variable(inputs.cuda()), Variable(labels.cuda())
             outputs = model(inputs)
-            loss,per_channel = criterion(outputs, labels)
+            loss = criterion(outputs, labels)
             loss.backward()
             optimizer.step()
             if (i+1)%10 == 0:
@@ -67,7 +69,7 @@ def main():
         
         scheduler.step()
 
-        if epoch % 10 == 0:
+        if (epoch+1) % 10 == 0:
             model.eval()
             val_loss = 0.0
             val_dice = 0.0
@@ -76,18 +78,25 @@ def main():
                 inputs, labels = data
                 inputs, labels = Variable(inputs.cuda()), Variable(labels.cuda())
                 outputs = model(inputs)
-                val_loss,per_channel= criterion(outputs, labels)
+                val_loss = criterion(outputs, labels)
                 val_loss+=val_loss.item()
                 val_dice+= dice_coef_metric(outputs, labels)
             val_loss /= len(val_loader)
             val_dice /= len(val_loader)
+
+            with open("VAL_LOGS.txt", "a+") as f:
+                f.write("epoch: %s,",str(epoch+1))
+                f.write("val_loss: %s,",str(val_loss))
+                f.write("val_dice: %s\n"%str(val_dice))
+
             print('Validation Loss: %.4f, Validation Dice: %.4f' % (val_loss, val_dice))
+            
             tb.add_scalar('Validation/Loss', val_loss, epoch)
             tb.add_scalar('Validation/Dice', val_dice, epoch)
             model.train()
             if val_loss < best_model:
                 best_model = val_loss
-                torch.save(model.state_dict(), './models/best_model.pth')
+                torch.save(model.state_dict(), args.ModelSavePath + "best_model.pkl")
                 print('Saving best model')
 
 if __name__ == '__main__':
