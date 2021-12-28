@@ -19,17 +19,17 @@ We use Volumetric Network(V-Net) which is a 3D Fully Convolutional Network(FCN) 
 
 ### Installing
 
-```
+1. ```
  pip install SimpleITK
 ```
-```
+2. ```
  pip install tensorboard
 ```
 
 ### Execution
 
 
-```python
+```
  python train.py
 ```
 ```train.py``` contains code for training the model and saving the weights.
