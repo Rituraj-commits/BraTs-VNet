@@ -8,6 +8,14 @@ BraTS is a dataset which provides multimodal 3D brain MRIs annotated by experts.
 Expert annotations are provided in the form of segmentation masks to detect 3 classes of tumour - edema(ED),enhancing tumour(ET),necrotic and non-enhancing tumour(NET/NCR). The dataset is challening in terms of the complex and heterogeneously-located targets.
 We use Volumetric Network(V-Net) which is a 3D Fully Convolutional Network(FCN) for segmentation of 3D medical images. We use Dice Loss as the objective function for the present scenario. Future implementation will include Hausdorff Loss for better boundary segmentations.
 
+<div align="center">
+  <img src="https://drive.google.com/file/d/1lnRjzOpa2n2S4w-DPGcsd3KyX9Nm20y4/view?usp=sharing">
+  <br>
+  <br>
+  <em align="center">Fig 1: Brain Tumour Segmentation </em>
+  <br>
+</div>
+
 ## Getting Started
 ### Dataset
 #### 4D Multimodal MRI dataset 
