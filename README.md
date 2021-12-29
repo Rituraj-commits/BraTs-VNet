@@ -9,7 +9,7 @@ Expert annotations are provided in the form of segmentation masks to detect 3 cl
 We use Volumetric Network(V-Net) which is a 3D Fully Convolutional Network(FCN) for segmentation of 3D medical images. We use Dice Loss as the objective function for the present scenario. Future implementation will include Hausdorff Loss for better boundary segmentations.
 
 <div align="center">
-  <img src="https://github.com/Rituraj-commits/BraTs-VNet/blob/main/figs/mri.png">
+  <img src="https://github.com/Rituraj-commits/BraTs-VNet/blob/main/figs/superpixel_mask.png">
   <br>
   <br>
   <em align="center">Fig 1: Brain Tumour Segmentation </em>
