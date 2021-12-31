@@ -20,7 +20,7 @@ class BratsDataset(Dataset):
             return len(os.listdir(self.dataset_path+self.mode+'/imagesTr'))
 
     def __getitem__(self, index):
-        file = open('/media/ri2raj/External HDD/Task01_BrainTumour/dataset.json')
+        file = open('Task01_BrainTumour/dataset.json')
         data = json.load(file)
         img = []
         label = []
