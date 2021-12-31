@@ -36,9 +36,9 @@ We use Dice loss as the objective function to train the model.
 We use Adam optimizer for optimizing the objective function. The learning rate is initially set to 0.001 and halved after every 100 epochs. We train the network until 500 epochs and the best weights are saved accordingly. We use NVIDIA Tesla P100 with 16 GB of VRAM to train the model.
 
 #### Evaluation
-We evaluate the model on the basis of Dice Score Coefficient(DSC).
+We evaluate the model on the basis of Dice Score Coefficient(DSC) and Intersection over Union(IoU) over three classes (WT+TC+ET).
 <div align="center">
-  <img src="https://github.com/Rituraj-commits/BraTs-VNet/blob/main/figs/sort.png">
+  <img src="https://github.com/Rituraj-commits/BraTs-VNet/blob/main/figs/result.png">
   <br>
   <br>
   <em align="center"></em>
@@ -90,6 +90,8 @@ We evaluate the model on the basis of Dice Score Coefficient(DSC).
 ```loader.py``` contains code for dataloading and train-test split.
 
 ```utils.py``` contains utility functions.
+
+```evaluate.py``` contains code for evaluation.
 
 ## Acknowledgments
 
