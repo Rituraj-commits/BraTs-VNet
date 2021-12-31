@@ -60,7 +60,7 @@ def main():
     best_model = 1.0
     tb = SummaryWriter()
 
-    if not os.path.exists(args.ModelSavePath):
+    if not os.path.isdir(args.ModelSavePath):
         os.makedirs(args.ModelSavePath)
 
     print("Start Training")
