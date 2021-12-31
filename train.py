@@ -40,11 +40,10 @@ def main():
     
     train_loader = DataLoader(train_dataset, batch_size=args.batch_size, num_workers=2,sampler=train_sampler)
     val_loader = DataLoader(train_dataset, batch_size=args.batch_size, num_workers=2,sampler=valid_sampler)
-    test_loader = DataLoader(test_dataset, batch_size=args.batch_size, shuffle=True, num_workers=2)
 
     if args.optimizer == 'adam':
         optimizer = optim.Adam(model.parameters(), lr=args.learning_rate)
-        scheduler = StepLR(optimizer, step_size=50, gamma=0.5)
+        scheduler = StepLR(optimizer, step_size=args.step_size, gamma=0.5)
     elif args.optimizer == 'sgd':
         optimizer = optim.SGD(model.parameters(), lr=args.learning_rate, momentum=0.9)
 
@@ -66,7 +65,7 @@ def main():
             optimizer.step()
             if (i+1)%10 == 0:
                 print('Epoch: [%d/%d], Step: [%d/%d], Loss: %.4f' % (epoch+1, args.epochs, i+1, len(train_loader), loss.item()))
-        
+
         scheduler.step()
 
         if (epoch+1) % 10 == 0:
@@ -85,8 +84,8 @@ def main():
             val_dice /= len(val_loader)
 
             with open("VAL_LOGS.txt", "a+") as f:
-                f.write("epoch: %s,",str(epoch+1))
-                f.write("val_loss: %s,",str(val_loss))
+                f.write("epoch: %s,"%str(epoch+1))
+                f.write("val_loss: %s,"%str(val_loss))
                 f.write("val_dice: %s\n"%str(val_dice))
 
             print('Validation Loss: %.4f, Validation Dice: %.4f' % (val_loss, val_dice))

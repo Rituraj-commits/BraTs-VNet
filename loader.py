@@ -2,7 +2,7 @@ import numpy as np
 import SimpleITK as sitk
 import os
 from torch.utils import data
-from torch.utils.data import Dataset, DataLoader, dataset
+from torch.utils.data import Dataset, DataLoader, dataloader, dataset
 from torch.utils.data.sampler import SubsetRandomSampler
 import json
 
@@ -14,10 +14,13 @@ class BratsDataset(Dataset):
         self.dataset_path = dataset_path
 
     def __len__(self):
-        return len(os.listdir(self.dataset_path+self.mode+'/imagesTr'))-11
+        if self.mode == 'train':
+            return len(os.listdir(self.dataset_path+self.mode+'/imagesTr'))-11
+        elif self.mode == 'test':
+            return len(os.listdir(self.dataset_path+self.mode+'/imagesTr'))
 
     def __getitem__(self, index):
-        file = open('Task01_BrainTumour/dataset.json')
+        file = open('/media/ri2raj/External HDD/Task01_BrainTumour/dataset.json')
         data = json.load(file)
         img = []
         label = []
@@ -119,4 +122,3 @@ class BratsDataset(Dataset):
             slicer[i] = slice(from_indices[i][0], from_indices[i][1])
 
         return np.pad(image[slicer], to_padding, **kwargs)
-
