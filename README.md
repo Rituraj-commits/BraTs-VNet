@@ -75,5 +75,5 @@ We evaluate the model on the basis of Dice Score Coefficient(DSC).
 
 ## Acknowledgments
 
-* [BraTS 3D UNet](https://www.kaggle.com/polomarco/brats20-3dunet-3dautoencoder)
-* [VNet](https://github.com/black0017/MedicalZooPytorch)
+* [1][BraTS 3D UNet](https://www.kaggle.com/polomarco/brats20-3dunet-3dautoencoder)
+* [2][VNet](https://github.com/black0017/MedicalZooPytorch)
