@@ -1,6 +1,7 @@
 import torch
 from utils import *
 
+
 class _AbstractDiceLoss(nn.Module):
     """
     Base class for different implementations of Dice loss.
@@ -8,7 +9,7 @@ class _AbstractDiceLoss(nn.Module):
 
     def __init__(self, weight=None, sigmoid_normalization=True):
         super(_AbstractDiceLoss, self).__init__()
-        self.register_buffer('weight', weight)
+        self.register_buffer("weight", weight)
         self.classes = None
         self.skip_index_after = None
         # The output from the network during training is assumed to be un-normalized probabilities and we would
@@ -38,31 +39,41 @@ class _AbstractDiceLoss(nn.Module):
         """
         target = expand_as_one_hot(target.long(), self.classes)
 
-        assert input.dim() == target.dim() == 5, "'input' and 'target' have different number of dims"
+        assert (
+            input.dim() == target.dim() == 5
+        ), "'input' and 'target' have different number of dims"
 
         if self.skip_index_after is not None:
             before_size = target.size()
             target = self.skip_target_channels(target, self.skip_index_after)
             print("Target {} after skip index {}".format(before_size, target.size()))
 
-        assert input.size() == target.size(), "'input' and 'target' must have the same shape"
+        assert (
+            input.size() == target.size()
+        ), "'input' and 'target' must have the same shape"
         # get probabilities from logits
         input = self.normalization(input)
 
         # compute per channel Dice coefficient
         per_channel_dice = self.dice(input, target, weight=self.weight)
 
-        loss = (1. - torch.mean(per_channel_dice))
+        loss = 1.0 - torch.mean(per_channel_dice)
         per_channel_dice = per_channel_dice.detach().cpu().numpy()
 
         # average Dice score across all channels/classes
         return loss, per_channel_dice
 
-class GeneralizedDiceLoss(_AbstractDiceLoss):
-    """Computes Generalized Dice Loss (GDL) as described in https://arxiv.org/pdf/1707.03237.pdf.
-    """
 
-    def __init__(self, classes=4, sigmoid_normalization=True, skip_index_after=None, epsilon=1e-6,):
+class GeneralizedDiceLoss(_AbstractDiceLoss):
+    """Computes Generalized Dice Loss (GDL) as described in https://arxiv.org/pdf/1707.03237.pdf."""
+
+    def __init__(
+        self,
+        classes=4,
+        sigmoid_normalization=True,
+        skip_index_after=None,
+        epsilon=1e-6,
+    ):
         super().__init__(weight=None, sigmoid_normalization=sigmoid_normalization)
         self.epsilon = epsilon
         self.classes = classes
@@ -94,24 +105,24 @@ class GeneralizedDiceLoss(_AbstractDiceLoss):
 
         return 2 * (intersect.sum() / denominator.sum())
 
+
 class DiceLoss(nn.Module):
     """Calculate dice loss."""
+
     def __init__(self, eps: float = 1e-9):
         super(DiceLoss, self).__init__()
         self.eps = eps
-        
-    def forward(self,
-                logits: torch.Tensor,
-                targets: torch.Tensor) -> torch.Tensor:
-        
+
+    def forward(self, logits: torch.Tensor, targets: torch.Tensor) -> torch.Tensor:
+
         num = targets.size(0)
         probability = torch.sigmoid(logits)
         probability = probability.view(num, -1)
         targets = targets.view(num, -1)
-        assert(probability.shape == targets.shape)
-        
+        assert probability.shape == targets.shape
+
         intersection = 2.0 * (probability * targets).sum()
         union = probability.sum() + targets.sum()
         dice_score = (intersection + self.eps) / union
-        #print("intersection", intersection, union, dice_score)
+        # print("intersection", intersection, union, dice_score)
         return 1.0 - dice_score

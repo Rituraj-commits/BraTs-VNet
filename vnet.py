@@ -2,6 +2,7 @@ import torch
 import torch.nn.functional as F
 import torch.nn as nn
 
+
 def passthrough(x, **kwargs):
     return x
 
@@ -39,7 +40,9 @@ class InputTransition(nn.Module):
         self.num_features = 16
         self.in_channels = in_channels
 
-        self.conv1 = nn.Conv3d(self.in_channels, self.num_features, kernel_size=5, padding=2)
+        self.conv1 = nn.Conv3d(
+            self.in_channels, self.num_features, kernel_size=5, padding=2
+        )
 
         self.bn1 = torch.nn.BatchNorm3d(self.num_features)
 
@@ -78,7 +81,9 @@ class DownTransition(nn.Module):
 class UpTransition(nn.Module):
     def __init__(self, inChans, outChans, nConvs, elu, dropout=False):
         super(UpTransition, self).__init__()
-        self.up_conv = nn.ConvTranspose3d(inChans, outChans // 2, kernel_size=2, stride=2)
+        self.up_conv = nn.ConvTranspose3d(
+            inChans, outChans // 2, kernel_size=2, stride=2
+        )
 
         self.bn1 = torch.nn.BatchNorm3d(outChans // 2)
         self.do1 = passthrough
