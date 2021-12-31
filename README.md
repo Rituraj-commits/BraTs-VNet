@@ -45,6 +45,16 @@ We evaluate the model on the basis of Dice Score Coefficient(DSC).
   <br>
 </div>
 
+#### Statistical Inference
+<div align="center">
+  <img src="https://github.com/Rituraj-commits/BraTs-VNet/blob/main/figs/Plot%2061.png">
+  <br>
+  <br>
+  <em align="center">Fig 1: Validation Dice Score Coefficient(DSC) </em>
+  <br>
+</div>
+
+
 ### Dependencies
 
 * SimpleITK 2.0.2
