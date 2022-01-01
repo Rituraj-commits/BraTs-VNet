@@ -53,6 +53,7 @@ We evaluate the model on the basis of Dice Score Coefficient(DSC) and Intersecti
   <em align="center">Fig 1: Brain Complete Tumour Segmentation(Blue indicates ground truth segmentation and red indicates predicted segmentation)  </em>
   <br>
 </div>
+
 ### Statistical Inference
 <div align="center">
   <img src="https://github.com/Rituraj-commits/BraTs-VNet/blob/main/figs/Plot%2061.png">
