@@ -38,7 +38,7 @@ We use Adam optimizer for optimizing the objective function. The learning rate i
 #### Evaluation
 We evaluate the model on the basis of Dice Score Coefficient(DSC) and Intersection over Union(IoU) over three classes (WT+TC+ET).
 <div align="center">
-  <img src="https://github.com/Rituraj-commits/BraTs-VNet/blob/main/figs/result.png">
+  <img src="https://github.com/Rituraj-commits/BraTs-VNet/blob/main/figs/result1.png">
   <br>
   <br>
   <em align="center"></em>
