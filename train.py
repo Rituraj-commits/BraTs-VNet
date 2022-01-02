@@ -32,12 +32,12 @@ def main():
     model.cuda()
 
     train_dataset = BratsDataset(
-        mode="train", crop_dim=(64, 64, 64), dataset_path=args.dataset_path
+        mode="train", crop_dim=args.crop_dim, dataset_path=args.dataset_path
     )
 
     indices = list(range(len(train_dataset)))
     np.random.shuffle(indices)
-    split = int(np.floor(0.2 * len(train_dataset)))
+    split = int(np.floor(args.validation_split * len(train_dataset)))
     train_idx, valid_idx = indices[split:], indices[:split]
     train_sampler = SubsetRandomSampler(train_idx)
     valid_sampler = SubsetRandomSampler(valid_idx)
@@ -99,7 +99,7 @@ def main():
 
             with open("VAL_LOGS.txt", "a+") as f:
                 f.write("epoch: %s," % str(epoch + 1))
-                f.write("val_loss: %s," % str(val_loss))
+                f.write("val_loss: %s," % str(val_loss.detach().cpu().numpy()))
                 f.write("val_dice: %s\n" % str(val_dice))
 
             print("Validation Loss: %.4f, Validation Dice: %.4f" % (val_loss, val_dice))
@@ -111,7 +111,6 @@ def main():
                 best_model = val_loss
                 torch.save(model.state_dict(), args.ModelSavePath + "best_model.pkl")
                 print("Saving best model")
-
 
 if __name__ == "__main__":
     main()
