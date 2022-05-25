@@ -3,6 +3,7 @@ from loader import *
 from config import *
 from losses import *
 from metrics import *
+from unet3d import *
 
 import torch
 import numpy as np
@@ -27,8 +28,7 @@ def weights_init(m):
 
 
 def main():
-    model = VNet(classes=3, in_channels=4)
-    model.apply(weights_init)
+    model = UNet3D(in_channels=4, out_channels=3)
     model.cuda()
 
     train_dataset = BratsDataset(
