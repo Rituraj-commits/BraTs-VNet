@@ -1,134 +1,128 @@
-from unet3d_utils import *
+
+import torch.nn as nn
+import torch.nn.functional as F
+import math
+import torch
+
+# adapt from https://github.com/MIC-DKFZ/BraTS2017
+
+def normalization(planes, norm='gn'):
+    if norm == 'bn':
+        m = nn.BatchNorm3d(planes)
+    elif norm == 'gn':
+        m = nn.GroupNorm(4, planes)
+    elif norm == 'in':
+        m = nn.InstanceNorm3d(planes)
+    else:
+        raise ValueError('normalization type {} is not supported'.format(norm))
+    return m
 
 
-class Abstract3DUNet(nn.Module):
-    """Implementation based on https://github.com/wolny/pytorch-3dunet.git"""
+class ConvD(nn.Module):
+    def __init__(self, inplanes, planes, dropout=0.0, norm='gn', first=False):
+        super(ConvD, self).__init__()
 
-    def __init__(
-        self,
-        in_channels,
-        out_channels,
-        final_sigmoid,
-        basic_module,
-        f_maps=64,
-        layer_order="gcr",
-        num_groups=8,
-        num_levels=4,
-        is_segmentation=True,
-        conv_kernel_size=3,
-        pool_kernel_size=2,
-        conv_padding=1,
-        **kwargs
-    ):
-        super(Abstract3DUNet, self).__init__()
+        self.first = first
+        self.maxpool = nn.MaxPool3d(2, 2)
 
-        if isinstance(f_maps, int):
-            f_maps = number_of_features_per_level(f_maps, num_levels=num_levels)
+        self.dropout = dropout
+        self.relu = nn.ReLU(inplace=True)
 
-        assert isinstance(f_maps, list) or isinstance(f_maps, tuple)
-        assert len(f_maps) > 1, "Required at least 2 levels in the U-Net"
+        self.conv1 = nn.Conv3d(inplanes, planes, 3, 1, 1, bias=False)
+        self.bn1   = normalization(planes, norm)
 
-        # create encoder path
-        self.encoders = create_encoders(
-            in_channels,
-            f_maps,
-            basic_module,
-            conv_kernel_size,
-            conv_padding,
-            layer_order,
-            num_groups,
-            pool_kernel_size,
-        )
+        self.conv2 = nn.Conv3d(planes, planes, 3, 1, 1, bias=False)
+        self.bn2   = normalization(planes, norm)
 
-        # create decoder path
-        self.decoders = create_decoders(
-            f_maps,
-            basic_module,
-            conv_kernel_size,
-            conv_padding,
-            layer_order,
-            num_groups,
-            upsample=True,
-        )
-
-        # in the last layer a 1×1 convolution reduces the number of output
-        # channels to the number of labels
-        self.final_conv = nn.Conv3d(f_maps[0], out_channels, 1)
-
-        if is_segmentation:
-            # semantic segmentation problem
-            if final_sigmoid:
-                self.final_activation = nn.Sigmoid()
-            else:
-                self.final_activation = nn.Softmax(dim=1)
-        else:
-            # regression problem
-            self.final_activation = None
+        self.conv3 = nn.Conv3d(planes, planes, 3, 1, 1, bias=False)
+        self.bn3   = normalization(planes, norm)
 
     def forward(self, x):
-        # encoder part
-        encoders_features = []
-        for encoder in self.encoders:
-            x = encoder(x)
-            # reverse the encoder outputs to be aligned with the decoder
-            encoders_features.insert(0, x)
-
-        # remove the last encoder's output from the list
-        # !!remember: it's the 1st in the list
-        encoders_features = encoders_features[1:]
-
-        # decoder part
-        for decoder, encoder_features in zip(self.decoders, encoders_features):
-            # pass the output from the corresponding encoder and the output
-            # of the previous decoder
-            x = decoder(encoder_features, x)
-
-        x = self.final_conv(x)
-
-        # apply final_activation (i.e. Sigmoid or Softmax) only during prediction. During training the network outputs logits
-        if not self.training and self.final_activation is not None:
-            x = self.final_activation(x)
-
-        return x
+        if not self.first:
+            x = self.maxpool(x)
+        x = self.bn1(self.conv1(x))
+        y = self.relu(self.bn2(self.conv2(x)))
+        if self.dropout > 0:
+            y = F.dropout3d(y, self.dropout)
+        y = self.bn3(self.conv3(x))
+        return self.relu(x + y)
 
 
-class UNet3D(Abstract3DUNet):
-    """
-    3DUnet model from
-    `"3D U-Net: Learning Dense Volumetric Segmentation from Sparse Annotation"
-        <https://arxiv.org/pdf/1606.06650.pdf>`.
-    Uses `DoubleConv` as a basic_module and nearest neighbor upsampling in the decoder
-    """
+class ConvU(nn.Module):
+    def __init__(self, planes, norm='gn', first=False):
+        super(ConvU, self).__init__()
 
-    def __init__(
-        self,
-        in_channels,
-        out_channels,
-        final_sigmoid=True,
-        f_maps=64,
-        layer_order="gcr",
-        num_groups=8,
-        num_levels=4,
-        is_segmentation=True,
-        conv_padding=1,
-        **kwargs
-    ):
-        super(UNet3D, self).__init__(
-            in_channels=in_channels,
-            out_channels=out_channels,
-            final_sigmoid=final_sigmoid,
-            basic_module=DoubleConv,
-            f_maps=f_maps,
-            layer_order=layer_order,
-            num_groups=num_groups,
-            num_levels=num_levels,
-            is_segmentation=is_segmentation,
-            conv_padding=conv_padding,
-            **kwargs
-        )
+        self.first = first
 
-model = UNet3D(in_channels=4, out_channels=3)
-model.cuda()
-x = torch.randn(1, 4, 64, 64, 64).cuda()
-y = model(x)
-print(y.shape)
+        if not self.first:
+            self.conv1 = nn.Conv3d(2*planes, planes, 3, 1, 1, bias=False)
+            self.bn1   = normalization(planes, norm)
+
+        self.conv2 = nn.Conv3d(planes, planes//2, 1, 1, 0, bias=False)
+        self.bn2   = normalization(planes//2, norm)
+
+        self.conv3 = nn.Conv3d(planes, planes, 3, 1, 1, bias=False)
+        self.bn3   = normalization(planes, norm)
+
+        self.relu = nn.ReLU(inplace=True)
+
+    def forward(self, x, prev):
+        # final output is the localization layer
+        if not self.first:
+            x = self.relu(self.bn1(self.conv1(x)))
+
+        y = F.upsample(x, scale_factor=2, mode='trilinear', align_corners=False)
+        y = self.relu(self.bn2(self.conv2(y)))
+
+        y = torch.cat([prev, y], 1)
+        y = self.relu(self.bn3(self.conv3(y)))
+
+        return y
+
+
+class Unet3D(nn.Module):
+    def __init__(self, c=4, n=16, dropout=0.5, norm='gn', num_classes=5):
+        super(Unet3D, self).__init__()
+        self.upsample = nn.Upsample(scale_factor=2,
+                mode='trilinear', align_corners=False)
+
+        self.convd1 = ConvD(c,     n, dropout, norm, first=True)
+        self.convd2 = ConvD(n,   2*n, dropout, norm)
+        self.convd3 = ConvD(2*n, 4*n, dropout, norm)
+        self.convd4 = ConvD(4*n, 8*n, dropout, norm)
+        self.convd5 = ConvD(8*n,16*n, dropout, norm)
+
+        self.convu4 = ConvU(16*n, norm, True)
+        self.convu3 = ConvU(8*n, norm)
+        self.convu2 = ConvU(4*n, norm)
+        self.convu1 = ConvU(2*n, norm)
+
+        self.seg3 = nn.Conv3d(8*n, num_classes, 1)
+        self.seg2 = nn.Conv3d(4*n, num_classes, 1)
+        self.seg1 = nn.Conv3d(2*n, num_classes, 1)
+
+        for m in self.modules():
+            if isinstance(m, nn.Conv3d):
+                nn.init.kaiming_normal_(m.weight, mode='fan_out', nonlinearity='relu')
+            elif isinstance(m, nn.BatchNorm3d) or isinstance(m, nn.GroupNorm):
+                nn.init.constant_(m.weight, 1)
+                nn.init.constant_(m.bias, 0)
+
+    def forward(self, x):
+        x1 = self.convd1(x)
+        x2 = self.convd2(x1)
+        x3 = self.convd3(x2)
+        x4 = self.convd4(x3)
+        x5 = self.convd5(x4)
+
+        y4 = self.convu4(x5, x4)
+        y3 = self.convu3(y4, x3)
+        y2 = self.convu2(y3, x2)
+        y1 = self.convu1(y2, x1)
+
+        y3 = self.seg3(y3)
+        y2 = self.seg2(y2) + self.upsample(y3)
+        y1 = self.seg1(y1) + self.upsample(y2)
+
+        return y1
+
