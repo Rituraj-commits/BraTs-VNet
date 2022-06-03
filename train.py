@@ -3,6 +3,7 @@ from loader import *
 from config import *
 from losses import *
 from metrics import *
+from unet3d import *
 
 import torch
 import numpy as np
@@ -27,12 +28,11 @@ def weights_init(m):
 
 
 def main():
-    model = VNet(classes=3, in_channels=4)
-    model.apply(weights_init)
+    model = Unet3D(c=4, n=16, dropout=0.5, norm='gn', num_classes=3)
     model.cuda()
 
     train_dataset = BratsDataset(
-        mode="train", crop_dim=(64, 64, 64), dataset_path=args.dataset_path
+        mode="train", crop_dim=args.crop_dim, dataset_path=args.dataset_path
     )
 
     indices = list(range(len(train_dataset)))
@@ -99,13 +99,11 @@ def main():
 
             with open("VAL_LOGS.txt", "a+") as f:
                 f.write("epoch: %s," % str(epoch + 1))
-                f.write("val_loss: %s," % str(val_loss))
+                f.write("val_loss: %s," % str(val_loss.data.cpu().numpy()))
                 f.write("val_dice: %s\n" % str(val_dice))
 
             print("Validation Loss: %.4f, Validation Dice: %.4f" % (val_loss, val_dice))
 
-            tb.add_scalar("Validation/Loss", val_loss, epoch)
-            tb.add_scalar("Validation/Dice", val_dice, epoch)
             model.train()
             if val_loss < best_model:
                 best_model = val_loss
