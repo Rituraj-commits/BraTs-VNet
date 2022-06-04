@@ -1,9 +1,8 @@
-from vnet import *
 from loader import *
 from config import *
 from losses import *
 from metrics import *
-from unet3d import *
+from densenet3d import *
 
 import torch
 import numpy as np
@@ -28,7 +27,7 @@ def weights_init(m):
 
 
 def main():
-    model = Unet3D(c=4, n=16, dropout=0.5, norm='gn', num_classes=3)
+    model = SinglePathDenseNet(in_channels=4, num_classes=3)
     model.cuda()
 
     train_dataset = BratsDataset(
