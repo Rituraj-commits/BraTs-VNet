@@ -1,4 +1,4 @@
-# BraTS(Brain Tumour Segmentation) using V-Net
+# 3D Automatic Brain Tumor Segmentation using Fully Convolutional Networks
 
 This project is an approach to detect brain tumours using BraTS 2016,2017 dataset.
 
