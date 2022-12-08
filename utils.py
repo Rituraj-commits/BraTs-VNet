@@ -1,5 +1,8 @@
 import torch
 import torch.nn as nn
+import numpy as np
+import matplotlib.pyplot as plt
+from skimage.util import montage
 
 
 def expand_as_one_hot(input, C, ignore_index=None):
@@ -79,3 +82,57 @@ def flatten(tensor):
     transposed = tensor.permute(axis_order)
     # Flatten: (C, N, D, H, W) -> (C, N * D * H * W)
     return transposed.contiguous().view(C, -1)
+
+
+  
+def mask_preprocessing(mask):
+    """
+    Test.
+    """
+    mask = mask.squeeze().cpu().detach().numpy()
+    mask = np.moveaxis(mask, (0, 1, 2, 3), (0, 3, 2, 1))
+
+    mask_WT = np.rot90(montage(mask[0]))
+    mask_TC = np.rot90(montage(mask[1]))
+    mask_ET = np.rot90(montage(mask[2]))
+
+    return mask_WT, mask_TC, mask_ET
+
+def image_preprocessing(image):
+    """
+    Returns image flair as mask for overlaping gt and predictions.
+    """
+    image = image.squeeze().cpu().detach().numpy()
+    image = np.moveaxis(image, (0, 1, 2, 3), (0, 3, 2, 1))
+    flair_img = np.rot90(montage(image[0]))
+    return flair_img
+
+def plot(image, ground_truth, prediction):
+    image = image_preprocessing(image)
+    gt_mask_WT, gt_mask_TC, gt_mask_ET = mask_preprocessing(ground_truth)
+    pr_mask_WT, pr_mask_TC, pr_mask_ET = mask_preprocessing(prediction)
+    
+    fig, axes = plt.subplots(1, 2, figsize = (35, 30))
+
+    [ax.axis("off") for ax in axes]
+    axes[0].set_title("Ground Truth", fontsize=35, weight='bold')
+    axes[0].imshow(image, cmap ='bone')
+    axes[0].imshow(np.ma.masked_where(gt_mask_WT == False, gt_mask_WT),
+                cmap='cool_r', alpha=0.6)
+    axes[0].imshow(np.ma.masked_where(gt_mask_TC == False, gt_mask_TC),
+                cmap='autumn_r', alpha=0.6)
+    axes[0].imshow(np.ma.masked_where(gt_mask_ET == False, gt_mask_ET),
+                cmap='autumn', alpha=0.6)
+
+    axes[1].set_title("Prediction", fontsize=35, weight='bold')
+    axes[1].imshow(image, cmap ='bone')
+    axes[1].imshow(np.ma.masked_where(pr_mask_WT == False, pr_mask_WT),
+                cmap='cool_r', alpha=0.6)
+    axes[1].imshow(np.ma.masked_where(pr_mask_TC == False, pr_mask_TC),
+                cmap='autumn_r', alpha=0.6)
+    axes[1].imshow(np.ma.masked_where(pr_mask_ET == False, pr_mask_ET),
+                cmap='autumn', alpha=0.6)
+
+    plt.tight_layout()
+    
+    plt.show()

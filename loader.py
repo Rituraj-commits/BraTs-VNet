@@ -5,7 +5,6 @@ from torch.utils import data
 from torch.utils.data import Dataset,DataLoader
 import json
 
-
 class BratsDataset(Dataset):
     def __init__(
         self, mode, classes=3, crop_dim=(64, 64, 64), dataset_path="./BraTs_data/"
@@ -22,7 +21,7 @@ class BratsDataset(Dataset):
             return len(os.listdir(self.dataset_path + self.mode + "/imagesTr"))
 
     def __getitem__(self, index):
-        file = open("Task01_BrainTumour/dataset.json")
+        file = open("BrainTumor/dataset.json")
         data = json.load(file)
         img = []
         label = []

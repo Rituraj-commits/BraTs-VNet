@@ -2,7 +2,7 @@ from loader import *
 from config import *
 from losses import *
 from metrics import *
-from densenet3d import *
+from voxelnet import *
 
 import torch
 import numpy as np
@@ -10,8 +10,6 @@ import torch.nn as nn
 import torch.optim as optim
 
 from torch.autograd import Variable
-from torch.optim.lr_scheduler import StepLR
-from torch.utils.tensorboard import SummaryWriter
 from torch.utils.data.sampler import SubsetRandomSampler
 
 import warnings
@@ -27,8 +25,12 @@ def weights_init(m):
 
 
 def main():
-    model = SinglePathDenseNet(in_channels=4, num_classes=3)
-    model.cuda()
+    model = DenseVoxelNet(in_channels=4,classes=3)
+    if(torch.cuda.is_available()):
+        print("Using ",torch.cuda.get_device_name(0))
+        model.cuda()
+    else:
+        print("Using CPU")
 
     train_dataset = BratsDataset(
         mode="train", crop_dim=args.crop_dim, dataset_path=args.dataset_path
@@ -49,15 +51,26 @@ def main():
     )
 
     if args.optimizer == "adam":
+        print("Using Adam Optimizer")
         optimizer = optim.Adam(model.parameters(), lr=args.learning_rate)
-        scheduler = StepLR(optimizer, step_size=args.step_size, gamma=0.5)
     elif args.optimizer == "sgd":
+        print("Using SGD Optimizer")
         optimizer = optim.SGD(model.parameters(), lr=args.learning_rate, momentum=0.9)
+    else:
+        raise NotImplementedError
 
-    criterion = DiceLoss()
+    if(args.loss == "dice"):
+        print("Using Dice Loss")
+        criterion = DiceLoss()
+    elif(args.loss == "hausdorff"):
+        print("Using Hausdorff Loss")
+        raise NotImplementedError
+    else:
+        print("Using BCE Loss")
+        criterion = nn.BCEWithLogitsLoss()
+
     criterion.cuda()
     best_model = 1.0
-    tb = SummaryWriter()
 
     if not os.path.isdir(args.ModelSavePath):
         os.makedirs(args.ModelSavePath)
@@ -79,9 +92,7 @@ def main():
                     % (epoch + 1, args.epochs, i + 1, len(train_loader), loss.item())
                 )
 
-        scheduler.step()
-
-        if (epoch + 1) % 10 == 0:
+        if (epoch + 1) % 1 == 0:
             model.eval()
             val_loss = 0.0
             val_dice = 0.0
