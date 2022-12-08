@@ -3,6 +3,8 @@ from config import *
 from losses import *
 from metrics import *
 from voxelnet import *
+from unet3d import *
+from vnet import *
 
 import torch
 import numpy as np
@@ -25,6 +27,18 @@ def weights_init(m):
 
 
 def main():
+    if(args.model=="unet3d"):
+        print("Using UNet3D")
+        model = Unet3D(c=4, num_classes=3)
+    elif(args.model=="vnet"):
+        print("Using VNet")
+        model = VNet(in_channels=4, classes=3)
+    elif(args.model=="densevoxelnet"):
+        print("Using DenseVoxelNet")
+        model = DenseVoxelNet(in_channels=4,classes=3)
+    else:
+        raise NotImplementedError
+
     model = DenseVoxelNet(in_channels=4,classes=3)
     if(torch.cuda.is_available()):
         print("Using ",torch.cuda.get_device_name(0))
@@ -59,24 +73,24 @@ def main():
     else:
         raise NotImplementedError
 
-    if(args.loss == "dice"):
-        print("Using Dice Loss")
+    if args.loss == "dice":
         criterion = DiceLoss()
-    elif(args.loss == "hausdorff"):
-        print("Using Hausdorff Loss")
-        raise NotImplementedError
+    elif args.loss == "bce":
+        criterion = nn.BCELoss()
+    elif args.loss == "hausdorff":
+        criterion = HausdorffDTLoss()
     else:
-        print("Using BCE Loss")
-        criterion = nn.BCEWithLogitsLoss()
+        raise NotImplementedError
+
+    criterion = HausdorffDTLoss()
 
     criterion.cuda()
-    best_model = 1.0
+    
 
     if not os.path.isdir(args.ModelSavePath):
         os.makedirs(args.ModelSavePath)
 
     print("Start Training")
-
     for epoch in range(args.epochs):
         for i, data in enumerate(train_loader):
             optimizer.zero_grad()
@@ -92,33 +106,9 @@ def main():
                     % (epoch + 1, args.epochs, i + 1, len(train_loader), loss.item())
                 )
 
-        if (epoch + 1) % 1 == 0:
-            model.eval()
-            val_loss = 0.0
-            val_dice = 0.0
-
-            for i, data in enumerate(val_loader):
-                inputs, labels = data
-                inputs, labels = Variable(inputs.cuda()), Variable(labels.cuda())
-                outputs = model(inputs)
-                val_loss = criterion(outputs, labels)
-                val_loss += val_loss.item()
-                val_dice += dice_coef_metric(outputs, labels)
-            val_loss /= len(val_loader)
-            val_dice /= len(val_loader)
-
-            with open("VAL_LOGS.txt", "a+") as f:
-                f.write("epoch: %s," % str(epoch + 1))
-                f.write("val_loss: %s," % str(val_loss.data.cpu().numpy()))
-                f.write("val_dice: %s\n" % str(val_dice))
-
-            print("Validation Loss: %.4f, Validation Dice: %.4f" % (val_loss, val_dice))
-
-            model.train()
-            if val_loss < best_model:
-                best_model = val_loss
-                torch.save(model.state_dict(), args.ModelSavePath + "best_model.pkl")
-                print("Saving best model")
+        if (epoch + 1) % 10 == 0:
+            torch.save(model.state_dict(), args.ModelSavePath + "best_model.pkl")
+            print("Saving best model")
 
 
 if __name__ == "__main__":

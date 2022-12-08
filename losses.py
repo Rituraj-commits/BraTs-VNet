@@ -15,7 +15,6 @@ Hausdorff loss implementation based on paper:
 https://arxiv.org/pdf/1904.10030.pdf
 """
 
-
 class HausdorffDTLoss(nn.Module):
     """Binary Hausdorff loss based on distance transform"""
 
@@ -53,17 +52,21 @@ class HausdorffDTLoss(nn.Module):
             pred.dim() == target.dim()
         ), "Prediction and target need to be of same dimension"
 
-        # pred = torch.sigmoid(pred)
+        pred = torch.sigmoid(pred)
 
-        pred_dt = torch.from_numpy(self.distance_field(pred.cpu().numpy())).float()
-        target_dt = torch.from_numpy(self.distance_field(target.cpu().numpy())).float()
+        pred_dt = torch.from_numpy(
+            self.distance_field(pred.detach().cpu().numpy())
+        ).float()
+        target_dt = torch.from_numpy(
+            self.distance_field(target.detach().cpu().numpy())
+        ).float()
 
         pred_error = (pred - target) ** 2
-        distance = pred_dt ** self.alpha + target_dt ** self.alpha
+        distance = pred_dt ** 2.0 + target_dt ** 2.0
+        distance = distance.cuda()
 
         dt_field = pred_error * distance
         loss = dt_field.mean()
-
         return loss
 
 
