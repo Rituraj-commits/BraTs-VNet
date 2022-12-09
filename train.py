@@ -108,7 +108,7 @@ def main():
                 )
 
         if (epoch + 1) % 10 == 0:
-            torch.save(model.state_dict(), args.ModelSavePath + "best_model.pkl")
+            torch.save(model.state_dict(), args.ModelSavePath + "%s_model_%s.pkl" % (args.model, args.loss))
             print("Saving best model")
 
 
