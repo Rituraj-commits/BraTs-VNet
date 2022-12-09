@@ -74,15 +74,16 @@ def main():
         raise NotImplementedError
 
     if args.loss == "dice":
+        print("Using Dice Loss")
         criterion = DiceLoss()
     elif args.loss == "bce":
-        criterion = nn.BCELoss()
+        print("Using BCE Loss")
+        criterion = nn.BCEWithLogitsLoss()
     elif args.loss == "hausdorff":
+        print("Using Hausdorff Loss")
         criterion = HausdorffDTLoss()
     else:
         raise NotImplementedError
-
-    criterion = HausdorffDTLoss()
 
     criterion.cuda()
     

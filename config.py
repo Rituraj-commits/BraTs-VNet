@@ -1,7 +1,7 @@
 import argparse
 
 parser = argparse.ArgumentParser()
-parser.add_argument("--batch_size", type=int, default=1, help="input batch size")
+parser.add_argument("--batch_size", type=int, default=5, help="input batch size")
 parser.add_argument("-g", "--gpu", type=int, default=0)
 parser.add_argument("-nEpochs", "--epochs", type=int, default=500)
 parser.add_argument("-lr", "--learning_rate", type=float, default=0.001)
