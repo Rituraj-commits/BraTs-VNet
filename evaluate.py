@@ -1,10 +1,13 @@
 from vnet import *
+from unet3d import *
+from voxelnet import *
 from loader import *
 from config import *
 from metrics import *
 
 import torch
 import os
+from tqdm import tqdm
 
 from torch.autograd import Variable
 
@@ -21,15 +24,31 @@ def weights_init(m):
 
 
 def main():
-    model = VNet(classes=3, in_channels=4)
-    model.apply(weights_init)
+    if(args.model=="unet3d"):
+        print("Using UNet3D")
+        model = Unet3D(c=4, num_classes=3)
+    elif(args.model=="vnet"):
+        print("Using VNet")
+        model = VNet(in_channels=4, classes=3)
+        model.apply(weights_init)
+    elif(args.model=="DenseVoxNet"):
+        print("Using DenseVoxelNet")
+        model = DenseVoxelNet(in_channels=4,classes=3)
+    else:
+        raise NotImplementedError
+
     if os.path.exists(args.ModelPath):
         model.load_state_dict(torch.load(args.ModelPath))
         print("Model Loaded")
     else:
         print("Model not found")
 
-    model.cuda()
+    if(torch.cuda.is_available()):
+        print("Using ",torch.cuda.get_device_name(0))
+        model.cuda()
+    else:
+        print("Using CPU")
+
     model.eval()
 
     test_dataset = BratsDataset(
@@ -41,7 +60,7 @@ def main():
     dice_scores = []
     iou_scores = []
     with torch.no_grad():
-        for i, data in enumerate(test_loader):
+        for _, data in enumerate(tqdm(test_loader)):
             inputs, labels = data
             inputs, labels = Variable(inputs.cuda()), Variable(labels.cuda())
             outputs = model(inputs)

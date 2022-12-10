@@ -18,6 +18,9 @@ import warnings
 
 warnings.filterwarnings("ignore")
 
+from random import seed
+
+seed(args.seed)
 
 def weights_init(m):
     classname = m.__class__.__name__
@@ -33,13 +36,13 @@ def main():
     elif(args.model=="vnet"):
         print("Using VNet")
         model = VNet(in_channels=4, classes=3)
+        model.apply(weights_init)
     elif(args.model=="densevoxelnet"):
         print("Using DenseVoxelNet")
         model = DenseVoxelNet(in_channels=4,classes=3)
     else:
         raise NotImplementedError
 
-    model = DenseVoxelNet(in_channels=4,classes=3)
     if(torch.cuda.is_available()):
         print("Using ",torch.cuda.get_device_name(0))
         model.cuda()
