@@ -21,7 +21,7 @@ class BratsDataset(Dataset):
             return len(os.listdir(self.dataset_path + self.mode + "/imagesTr"))
 
     def __getitem__(self, index):
-        file = open("BrainTumor/dataset.json")
+        file = open("../BrainTumor/dataset.json")
         data = json.load(file)
         img = []
         label = []
@@ -56,12 +56,21 @@ class BratsDataset(Dataset):
         elif self.mode == "test":
             img_path = self.dataset_path + self.mode + "/" + img_test[index]
         img = self.load_image(img_path)
+        images = []
         img1 = self.resize_image(img[0, :, :], self.crop_dim, mode="symmetric")  # Flair
+        img1 = self.normalize(img1)
+        images.append(img1)
         img2 = self.resize_image(img[1, :, :], self.crop_dim, mode="symmetric")  # T1w
+        img2 = self.normalize(img2)
+        images.append(img2)
         img3 = self.resize_image(img[2, :, :], self.crop_dim, mode="symmetric")  # t1gd
+        img3 = self.normalize(img3)
+        images.append(img3)
         img4 = self.resize_image(img[3, :, :], self.crop_dim, mode="symmetric")  # T2w
-        img = np.stack((img1, img2, img3, img4), axis=0)
-        img = self.normalize(img)
+        img4 = self.normalize(img4)
+        images.append(img4)
+        img = np.stack(images)
+        
 
         if self.mode == "train":
             mask_path = self.dataset_path + self.mode + "/" + label[index]
@@ -69,23 +78,23 @@ class BratsDataset(Dataset):
             mask_path = self.dataset_path + self.mode + "/" + label_test[index]
         mask = self.load_image(mask_path)
         mask = self.resize_image(mask, self.crop_dim, mode="symmetric")
-        mask = np.clip(mask, 0, 1)
+       
         mask_WT = mask.copy()
         mask_WT[mask_WT == 1] = 1
         mask_WT[mask_WT == 2] = 1
-        mask_WT[mask_WT == 4] = 1
+        mask_WT[mask_WT == 3] = 1
 
         mask_TC = mask.copy()
         mask_TC[mask_TC == 1] = 1
         mask_TC[mask_TC == 2] = 0
-        mask_TC[mask_TC == 4] = 1
+        mask_TC[mask_TC == 3] = 1
 
         mask_ET = mask.copy()
         mask_ET[mask_ET == 1] = 0
         mask_ET[mask_ET == 2] = 0
-        mask_ET[mask_ET == 4] = 1
+        mask_ET[mask_ET == 3] = 1
 
-        mask = np.stack([mask_WT, mask_TC, mask_ET]).astype(np.float32)
+        mask = np.stack([mask_WT, mask_TC, mask_ET])
 
         return img, mask
 
@@ -122,3 +131,22 @@ class BratsDataset(Dataset):
             slicer[i] = slice(from_indices[i][0], from_indices[i][1])
 
         return np.pad(image[slicer], to_padding, **kwargs)
+
+
+## Visualize the data
+
+'''if __name__ == "__main__":
+    dataset = BratsDataset(mode="train", dataset_path="../BrainTumor/", crop_dim=(32,128,128))
+    dataloader = DataLoader(dataset, batch_size=1, shuffle=True, num_workers=0)
+    data = next(iter(dataloader))
+    img = data[0].squeeze()[0]
+    mask = data[1].squeeze()[0]
+    print(img.shape)
+    print(mask.shape)
+    img = montage(img)
+    mask = montage(mask)
+    fig, ax = plt.subplots(1, 1, figsize = (20, 20))
+    ax.imshow(img, cmap ='bone')
+    ax.imshow(np.ma.masked_where(mask == False, mask),
+           cmap='cool', alpha=0.6)
+    plt.show()'''

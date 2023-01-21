@@ -4,6 +4,74 @@ import numpy as np
 from scipy.ndimage.morphology import distance_transform_edt as edt
 
 
+def dice_coef_metric_per_classes(probabilities: np.ndarray,
+                                    truth: np.ndarray,
+                                    treshold: float = 0.5,
+                                    eps: float = 1e-9,
+                                    classes: list = ['WT', 'TC', 'ET']) -> np.ndarray:
+    """
+    Calculate Dice score for data batch and for each class.
+    Params:
+        probobilities: model outputs after activation function.
+        truth: model targets.
+        threshold: threshold for probabilities.
+        eps: additive to refine the estimate.
+        classes: list with name classes.
+        Returns: dict with dice scores for each class.
+    """
+    scores = {key: list() for key in classes}
+    num = probabilities.shape[0]
+    num_classes = probabilities.shape[1]
+    predictions = (probabilities >= treshold).astype(np.float32)
+    assert(predictions.shape == truth.shape)
+
+    for i in range(num):
+        for class_ in range(num_classes):
+            prediction = predictions[i][class_]
+            truth_ = truth[i][class_]
+            intersection = 2.0 * (truth_ * prediction).sum()
+            union = truth_.sum() + prediction.sum()
+            if truth_.sum() == 0 and prediction.sum() == 0:
+                 scores[classes[class_]].append(1.0)
+            else:
+                scores[classes[class_]].append((intersection + eps) / union)
+                
+    return scores
+
+def jaccard_coef_metric_per_classes(probabilities: np.ndarray,
+               truth: np.ndarray,
+               treshold: float = 0.5,
+               eps: float = 1e-9,
+               classes: list = ['WT', 'TC', 'ET']) -> np.ndarray:
+    """
+    Calculate Jaccard index for data batch and for each class.
+    Params:
+        probobilities: model outputs after activation function.
+        truth: model targets.
+        threshold: threshold for probabilities.
+        eps: additive to refine the estimate.
+        classes: list with name classes.
+        Returns: dict with jaccard scores for each class."
+    """
+    scores = {key: list() for key in classes}
+    num = probabilities.shape[0]
+    num_classes = probabilities.shape[1]
+    predictions = (probabilities >= treshold).astype(np.float32)
+    assert(predictions.shape == truth.shape)
+
+    for i in range(num):
+        for class_ in range(num_classes):
+            prediction = predictions[i][class_]
+            truth_ = truth[i][class_]
+            intersection = (prediction * truth_).sum()
+            union = (prediction.sum() + truth_.sum()) - intersection + eps
+            if truth_.sum() == 0 and prediction.sum() == 0:
+                 scores[classes[class_]].append(1.0)
+            else:
+                scores[classes[class_]].append((intersection + eps) / union)
+
+    return scores
+
 def dice_coef_metric(
     probabilities: torch.Tensor,
     truth: torch.Tensor,
@@ -53,31 +121,52 @@ def jaccard_coef_metric(
             scores.append((intersection + eps) / union)
     return np.mean(scores)
 
-class HausdorffDistance:
-    def hd_distance(self, x: np.ndarray, y: np.ndarray) -> np.ndarray:
 
-        if np.count_nonzero(x) == 0 or np.count_nonzero(y) == 0:
-            return np.array([np.Inf])
+def Sensitivity(probabilities: torch.Tensor,
+    truth: torch.Tensor,
+    treshold: float = 0.5,
+    eps: float = 1e-9,
+) -> np.ndarray:
 
-        indexes = np.nonzero(x)
-        distances = edt(np.logical_not(y))
+    scores = []
+    probabilities = probabilities.detach().cpu().numpy()
+    truth = truth.detach().cpu().numpy()
+    num = probabilities.shape[0]
+    predictions = probabilities >= treshold
+    assert predictions.shape == truth.shape
 
-        return np.array(np.max(distances[indexes]))
+    for i in range(num):
+        prediction = predictions[i]
+        truth_ = truth[i]
+        intersection = (prediction * truth_).sum()
+        union = truth_.sum() + eps
+        if truth_.sum() == 0 and prediction.sum() == 0:
+            scores.append(1.0)
+        else:
+            scores.append((intersection + eps) / union)
+    return np.mean(scores)
 
-    def compute(self, pred: torch.Tensor, target: torch.Tensor) -> torch.Tensor:
-        assert (
-            pred.shape[1] == 1 and target.shape[1] == 1
-        ), "Only binary channel supported"
+def Specificity(probabilities: torch.Tensor,
+    truth: torch.Tensor,
+    treshold: float = 0.5,
+    eps: float = 1e-9,
+) -> np.ndarray:
 
-        pred = (pred > 0.5).byte()
-        target = (target > 0.5).byte()
+    scores = []
+    probabilities = probabilities.detach().cpu().numpy()
+    truth = truth.detach().cpu().numpy()
+    num = probabilities.shape[0]
+    predictions = probabilities >= treshold
+    assert predictions.shape == truth.shape
 
-        right_hd = torch.from_numpy(
-            self.hd_distance(pred.cpu().numpy(), target.cpu().numpy())
-        ).float()
+    for i in range(num):
+        prediction = predictions[i]
+        truth_ = truth[i]
+        intersection = (prediction * truth_).sum()
+        union = prediction.sum() + eps
+        if truth_.sum() == 0 and prediction.sum() == 0:
+            scores.append(1.0)
+        else:
+            scores.append((intersection + eps) / union)
+    return np.mean(scores)
 
-        left_hd = torch.from_numpy(
-            self.hd_distance(target.cpu().numpy(), pred.cpu().numpy())
-        ).float()
-
-        return torch.max(right_hd, left_hd)

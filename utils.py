@@ -89,9 +89,7 @@ def mask_preprocessing(mask):
     """
     Test.
     """
-    mask = mask.squeeze().cpu().detach().numpy()
-    mask = np.moveaxis(mask, (0, 1, 2, 3), (0, 3, 2, 1))
-
+  
     mask_WT = np.rot90(montage(mask[0]))
     mask_TC = np.rot90(montage(mask[1]))
     mask_ET = np.rot90(montage(mask[2]))
@@ -102,13 +100,13 @@ def image_preprocessing(image):
     """
     Returns image flair as mask for overlaping gt and predictions.
     """
-    image = image.squeeze().cpu().detach().numpy()
-    image = np.moveaxis(image, (0, 1, 2, 3), (0, 3, 2, 1))
+    
     flair_img = np.rot90(montage(image[0]))
     return flair_img
 
 def plot(image, ground_truth, prediction):
     image = image_preprocessing(image)
+    
     gt_mask_WT, gt_mask_TC, gt_mask_ET = mask_preprocessing(ground_truth)
     pr_mask_WT, pr_mask_TC, pr_mask_ET = mask_preprocessing(prediction)
     

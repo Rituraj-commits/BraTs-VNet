@@ -4,6 +4,7 @@ https://github.com/black0017/MedicalZooPytorch/blob/8f40dab689841d7ff0e36aa5e583
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from torchsummary import summary
 
 class _HyperDenseLayer(nn.Sequential):
     def __init__(self, num_input_features, num_output_channels, drop_rate):
@@ -126,4 +127,3 @@ class SinglePathDenseNet(nn.Sequential):
 
         else:
             return features
-

@@ -18,9 +18,12 @@ import warnings
 
 warnings.filterwarnings("ignore")
 
-from random import seed
 
-seed(args.seed)
+def seed_everything(seed: int):
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed(seed)
 
 def weights_init(m):
     classname = m.__class__.__name__
@@ -30,6 +33,7 @@ def weights_init(m):
 
 
 def main():
+    seed_everything(args.seed)
     if(args.model=="unet3d"):
         print("Using UNet3D")
         model = Unet3D(c=4, num_classes=3)
@@ -106,8 +110,8 @@ def main():
             optimizer.step()
             if (i + 1) % 10 == 0:
                 print(
-                    "Epoch: [%d/%d], Step: [%d/%d], Loss: %.4f"
-                    % (epoch + 1, args.epochs, i + 1, len(train_loader), loss.item())
+                    "Epoch [%d/%d], Iter [%d/%d] Loss: %.4f"
+                    % (epoch + 1, args.epochs, i + 1, len(train_dataset) // args.batch_size, loss.item())
                 )
 
         if (epoch + 1) % 10 == 0:

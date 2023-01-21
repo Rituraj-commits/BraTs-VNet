@@ -2,12 +2,7 @@ import torch
 import torch.nn as nn
 
 """
-Implementation od DenseVoxelNet based on https://arxiv.org/abs/1708.00573
-Hyperparameters used:
-batch size = 3
-weight decay = 0.0005
-momentum = 0.9
-lr = 0.05
+Implementation of DenseVoxelNet based on https://arxiv.org/abs/1708.00573
 """
 
 
