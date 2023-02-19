@@ -154,3 +154,9 @@ class VNet(nn.Module):
         out = self.up_tr32(out, out16)
         out = self.out_tr(out)
         return out
+
+model = VNet(in_channels=4,classes=3).cuda()
+def count_parameters(model):
+    return sum(p.numel() for p in model.parameters() if p.requires_grad)
+
+print(count_parameters(model))  ## 45.61 M

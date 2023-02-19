@@ -7,23 +7,15 @@ from unet3d import *
 from vnet import *
 
 import torch
-import numpy as np
 import torch.nn as nn
 import torch.optim as optim
 
 from torch.autograd import Variable
-from torch.utils.data.sampler import SubsetRandomSampler
 
 import warnings
 
 warnings.filterwarnings("ignore")
 
-
-def seed_everything(seed: int):
-    np.random.seed(seed)
-    torch.manual_seed(seed)
-    if torch.cuda.is_available():
-        torch.cuda.manual_seed(seed)
 
 def weights_init(m):
     classname = m.__class__.__name__
@@ -33,22 +25,21 @@ def weights_init(m):
 
 
 def main():
-    seed_everything(args.seed)
-    if(args.model=="unet3d"):
+    if(args.model == "unet3d"):
         print("Using UNet3D")
         model = Unet3D(c=4, num_classes=3)
-    elif(args.model=="vnet"):
+    elif(args.model == "vnet"):
         print("Using VNet")
         model = VNet(in_channels=4, classes=3)
         model.apply(weights_init)
-    elif(args.model=="densevoxelnet"):
+    elif(args.model == "densevoxelnet"):
         print("Using DenseVoxelNet")
-        model = DenseVoxelNet(in_channels=4,classes=3)
+        model = DenseVoxelNet(in_channels=4, classes=3)
     else:
         raise NotImplementedError
 
     if(torch.cuda.is_available()):
-        print("Using ",torch.cuda.get_device_name(0))
+        print("Using ", torch.cuda.get_device_name(0))
         model.cuda()
     else:
         print("Using CPU")
@@ -57,18 +48,12 @@ def main():
         mode="train", crop_dim=args.crop_dim, dataset_path=args.dataset_path
     )
 
-    indices = list(range(len(train_dataset)))
-    np.random.shuffle(indices)
-    split = int(np.floor(0.2 * len(train_dataset)))
-    train_idx, valid_idx = indices[split:], indices[:split]
-    train_sampler = SubsetRandomSampler(train_idx)
-    valid_sampler = SubsetRandomSampler(valid_idx)
-
-    train_loader = DataLoader(
-        train_dataset, batch_size=args.batch_size, num_workers=2, sampler=train_sampler
-    )
-    val_loader = DataLoader(
-        train_dataset, batch_size=args.batch_size, num_workers=2, sampler=valid_sampler
+    train_loader = torch.utils.data.DataLoader(
+        train_dataset,
+        batch_size=args.batch_size,
+        shuffle=True,
+        num_workers=4,
+        pin_memory=True,
     )
 
     if args.optimizer == "adam":
@@ -76,7 +61,8 @@ def main():
         optimizer = optim.Adam(model.parameters(), lr=args.learning_rate)
     elif args.optimizer == "sgd":
         print("Using SGD Optimizer")
-        optimizer = optim.SGD(model.parameters(), lr=args.learning_rate, momentum=0.9)
+        optimizer = optim.SGD(model.parameters(),
+                              lr=args.learning_rate, momentum=0.9)
     else:
         raise NotImplementedError
 
@@ -93,7 +79,6 @@ def main():
         raise NotImplementedError
 
     criterion.cuda()
-    
 
     if not os.path.isdir(args.ModelSavePath):
         os.makedirs(args.ModelSavePath)
@@ -115,7 +100,8 @@ def main():
                 )
 
         if (epoch + 1) % 10 == 0:
-            torch.save(model.state_dict(), args.ModelSavePath + "%s_model_%s.pkl" % (args.model, args.loss))
+            torch.save(model.state_dict(), args.ModelSavePath +
+                       "%s_model_%s.pkl" % (args.model, args.loss))
             print("Saving best model")
 
 

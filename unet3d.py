@@ -126,3 +126,9 @@ class Unet3D(nn.Module):
 
         return y1
 
+model =  Unet3D(c=4, n=16, dropout=0.5, norm='gn', num_classes=3)
+model.cuda()
+## Count the number of parameters
+def count_parameters(model):
+    return sum(p.numel() for p in model.parameters() if p.requires_grad)
+

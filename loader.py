@@ -1,7 +1,6 @@
 import numpy as np
 import SimpleITK as sitk
 import os
-from torch.utils import data
 from torch.utils.data import Dataset,DataLoader
 import json
 
@@ -83,18 +82,19 @@ class BratsDataset(Dataset):
         mask_WT[mask_WT == 1] = 1
         mask_WT[mask_WT == 2] = 1
         mask_WT[mask_WT == 3] = 1
-
+       
         mask_TC = mask.copy()
         mask_TC[mask_TC == 1] = 1
         mask_TC[mask_TC == 2] = 0
         mask_TC[mask_TC == 3] = 1
-
+        
         mask_ET = mask.copy()
         mask_ET[mask_ET == 1] = 0
         mask_ET[mask_ET == 2] = 0
         mask_ET[mask_ET == 3] = 1
-
+       
         mask = np.stack([mask_WT, mask_TC, mask_ET])
+       
 
         return img, mask
 
@@ -139,6 +139,7 @@ class BratsDataset(Dataset):
     dataset = BratsDataset(mode="train", dataset_path="../BrainTumor/", crop_dim=(32,128,128))
     dataloader = DataLoader(dataset, batch_size=1, shuffle=True, num_workers=0)
     data = next(iter(dataloader))
+
     img = data[0].squeeze()[0]
     mask = data[1].squeeze()[0]
     print(img.shape)
