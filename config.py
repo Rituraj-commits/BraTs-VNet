@@ -1,7 +1,7 @@
 import argparse
 
 parser = argparse.ArgumentParser()
-parser.add_argument("--batch_size", type=int, default=5, help="input batch size")
+parser.add_argument("--batch_size", type=int, default=1, help="input batch size")
 parser.add_argument("-g", "--gpu", type=int, default=0)
 parser.add_argument("-nEpochs", "--epochs", type=int, default=500)
 parser.add_argument("-lr", "--learning_rate", type=float, default=0.001)
@@ -15,6 +15,6 @@ parser.add_argument("-step_size", "--step_size", type=int, default=100)
 parser.add_argument("-mp", "--ModelPath", type=str, default="../models/unet3d_model_bce.pkl")
 parser.add_argument("-c", "--crop_dim", type=tuple, default=(32,128,128))
 parser.add_argument("-vs", "--validation_split", type=float, default=0.2)
-parser.add_argument("-l", "--loss", type=str, default="hausdorff", choices=("dice", "bce","hausdorff"))
-parser.add_argument("-m", "--model", type=str, default="unet3d", choices=("unet3d", "vnet","DenseVoxNet"))
+parser.add_argument("-l", "--loss", type=str, default="bce", choices=("dice", "bce","hausdorff"))
+parser.add_argument("-m", "--model", type=str, default="runet", choices=("unet3d", "vnet","densevoxelnet","fcn","runet"))
 args = parser.parse_args()

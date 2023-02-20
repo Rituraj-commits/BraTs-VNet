@@ -1,7 +1,6 @@
 import torch
 import numpy as np
 
-from scipy.ndimage.morphology import distance_transform_edt as edt
 
 
 def dice_coef_metric_per_classes(probabilities: np.ndarray,

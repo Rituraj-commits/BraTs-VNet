@@ -1,14 +1,12 @@
 import torch
 from utils import *
 
-import cv2 as cv
 import numpy as np
 
 import torch
 from torch import nn
 
 from scipy.ndimage.morphology import distance_transform_edt as edt
-from scipy.ndimage import convolve
 
 """
 Hausdorff loss implementation based on paper:

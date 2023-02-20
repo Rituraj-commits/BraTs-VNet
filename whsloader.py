@@ -158,7 +158,9 @@ class WHSLoader(Dataset):
 
         return np.pad(image[slicer], to_padding, **kwargs)
 
-if __name__ == "__main__":
+
+# Visualize the dataset
+'''if __name__ == "__main__":
     dataset = WHSLoader(mode="train",classes=7, crop_dim=(32, 256, 256), dataset_path="../mr_train/",transform=True)
     for i in range(len(dataset)):
         img, mask = dataset[i]
@@ -175,7 +177,7 @@ if __name__ == "__main__":
         ax[2,1].imshow(mask[6][20],cmap="bone")
         
         plt.show()
-        break
+        break'''
         
         
        

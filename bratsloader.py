@@ -93,9 +93,7 @@ class BratsDataset(Dataset):
         mask_ET[mask_ET == 2] = 0
         mask_ET[mask_ET == 3] = 1
        
-        mask = np.stack([mask_WT, mask_TC, mask_ET])
-       
-
+        mask = np.stack([mask_WT, mask_TC, mask_ET]).astype(np.float32)
         return img, mask
 
     def load_image(self, file_path):
@@ -139,9 +137,11 @@ class BratsDataset(Dataset):
     dataset = BratsDataset(mode="train", dataset_path="../BrainTumor/", crop_dim=(32,128,128))
     dataloader = DataLoader(dataset, batch_size=1, shuffle=True, num_workers=0)
     data = next(iter(dataloader))
-
-    img = data[0].squeeze()[0]
-    mask = data[1].squeeze()[0]
+    img, mask = data
+    print(img.shape)
+    print(mask.shape)
+    img = data[0].squeeze()
+    mask = data[1].squeeze()
     print(img.shape)
     print(mask.shape)
     img = montage(img)

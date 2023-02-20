@@ -168,8 +168,3 @@ class FCN_Net(nn.Module):
         return h
 
     
-model = FCN_Net(in_channels=4,n_class=3).cuda()
-def count_parameters(model):
-    return sum(p.numel() for p in model.parameters() if p.requires_grad)
-
-print(count_parameters(model))  ## 12.23 M

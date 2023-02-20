@@ -1,10 +1,12 @@
-from loader import *
+from bratsloader import *
 from config import *
 from losses import *
 from metrics import *
 from voxelnet import *
 from unet3d import *
 from vnet import *
+from fcn import *
+from residual_unet3d import *
 
 import torch
 import torch.nn as nn
@@ -35,6 +37,12 @@ def main():
     elif(args.model == "densevoxelnet"):
         print("Using DenseVoxelNet")
         model = DenseVoxelNet(in_channels=4, classes=3)
+    elif(args.model == "fcn"):
+        print("Using FCN")
+        model = FCN_Net(in_channels=4, n_class=3)
+    elif(args.model == "runet"):
+        print("Using ResidualUNet3D")
+        model = ResidualUNet3D(in_channels=4, n_classes=3)
     else:
         raise NotImplementedError
 
@@ -90,7 +98,7 @@ def main():
             inputs, labels = data
             inputs, labels = Variable(inputs.cuda()), Variable(labels.cuda())
             outputs = model(inputs)
-            loss = criterion(outputs, labels)
+            loss = criterion(outputs, labels.float())
             loss.backward()
             optimizer.step()
             if (i + 1) % 10 == 0:

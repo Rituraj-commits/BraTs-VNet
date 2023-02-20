@@ -158,8 +158,3 @@ class SkipDenseNet3D(nn.Module):
         out = self.conv_class(self.relu_last(self.bn_class(out)))
         # ----------------------------------------------------------
         return out
-
-model =     SkipDenseNet3D(in_channels=4,classes=4).cuda()
-x = torch.randn(1, 4, 32, 128, 128).cuda()
-y = model(x)
-print(y.shape)

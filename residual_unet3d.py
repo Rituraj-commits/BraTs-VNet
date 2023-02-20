@@ -3,13 +3,13 @@ import torch.nn as nn
 import os
 
 
-class UNet(nn.Module):
+class ResidualUNet3D(nn.Module):
     """
     Implementations based on the Unet3D paper: https://arxiv.org/pdf/1706.00120.pdf
     """
 
     def __init__(self, in_channels, n_classes, base_n_filter=8):
-        super(UNet, self).__init__()
+        super(ResidualUNet3D, self).__init__()
         self.in_channels = in_channels
         self.n_classes = n_classes
         self.base_n_filter = base_n_filter
@@ -203,10 +203,3 @@ class UNet(nn.Module):
         seg_layer = out
         return seg_layer
 
-model = UNet(in_channels=4,n_classes=3)
-model.cuda()
-## Count the number of parameters
-def count_parameters(model):
-    return sum(p.numel() for p in model.parameters() if p.requires_grad)
-
-print(count_parameters(model)) ## 1.78 M
