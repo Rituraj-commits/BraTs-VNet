@@ -119,7 +119,7 @@ class WHSLoader(Dataset):
         mask_PA[mask_PA==820]=0
         mask_PA[mask_PA==850]=1
 
-        mask = np.stack([mask_LV, mask_RV, mask_LA, mask_RA, mask_MC, mask_AA, mask_PA])
+        mask = np.stack([mask_LV, mask_RV, mask_LA, mask_RA, mask_MC, mask_AA, mask_PA]).astype(np.float32)
         return mask
 
     def load_image(self, file_path: str):
