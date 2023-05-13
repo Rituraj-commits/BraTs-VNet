@@ -41,6 +41,8 @@ class ISEGLoader(Dataset):
 
         transform = RandomFlip(p=0.5)
         img, mask = transform(img, mask)
+        img = np.array(img, copy=True)
+        mask = np.array(mask, copy=True)
 
         return img, mask
 
@@ -72,11 +74,16 @@ class ISEGLoader(Dataset):
         data_min = np.min(data)
         return (data - data_min) / (np.max(data) - data_min)
 
+
+'''def has_negative_strides(arr):
+    return any(stride < 0 for stride in arr.strides)
 # Visualize the data
-'''if __name__ == "__main__":
+if __name__ == "__main__":
     dataset = ISEGLoader(mode="train", dataset_path="../iSeg-2017/")
     for i in range(len(dataset)):
         img, mask = dataset[i]
+        print(has_negative_strides(img))
+        print(has_negative_strides(mask))
         print(img.shape)
         print(mask.shape)
         fig,ax = plt.subplots(2,3)

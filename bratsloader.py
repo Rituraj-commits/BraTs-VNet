@@ -3,6 +3,7 @@ import SimpleITK as sitk
 import os
 from torch.utils.data import Dataset,DataLoader
 import json
+import matplotlib.pyplot as plt
 
 class BratsDataset(Dataset):
     def __init__(
@@ -132,8 +133,8 @@ class BratsDataset(Dataset):
 
 
 ## Visualize the data
-
-'''if __name__ == "__main__":
+'''
+if __name__ == "__main__":
     dataset = BratsDataset(mode="train", dataset_path="../BrainTumor/", crop_dim=(32,128,128))
     dataloader = DataLoader(dataset, batch_size=1, shuffle=True, num_workers=0)
     data = next(iter(dataloader))

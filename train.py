@@ -82,6 +82,7 @@ def main():
         train_dataset = BratsDataset(
             mode="train", crop_dim=args.crop_dim, dataset_path=args.dataset_path
         )
+        
     elif(args.dataset == "iseg"):
         print("Loading iseg dataset....")
         train_dataset = ISEGLoader(
@@ -124,6 +125,7 @@ def main():
     for epoch in range(args.epochs):
         for i, data in enumerate(train_loader):
             optimizer.zero_grad()
+            print("I'm here")
             inputs, labels = data
             inputs, labels = Variable(inputs.cuda()), Variable(labels.cuda())
             outputs = model(inputs)
