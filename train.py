@@ -125,10 +125,9 @@ def main():
     for epoch in range(args.epochs):
         for i, data in enumerate(train_loader):
             optimizer.zero_grad()
-            print("I'm here")
             inputs, labels = data
             inputs, labels = Variable(inputs.cuda()), Variable(labels.cuda())
-            outputs = model(inputs)
+            outputs = model(inputs.float())
             loss = criterion(outputs, labels.float())
             loss.backward()
             optimizer.step()
