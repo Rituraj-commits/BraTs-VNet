@@ -7,9 +7,8 @@ from augmentations import *
 
 
 class ISEGLoader(Dataset):
-    def __init__(self, mode: str, classes: int, dataset_path: str):
+    def __init__(self, mode: str, dataset_path: str):
         self.mode = mode
-        self.classes = classes
         self.dataset_path = dataset_path
 
     def __len__(self):
@@ -75,7 +74,7 @@ class ISEGLoader(Dataset):
 
 # Visualize the data
 '''if __name__ == "__main__":
-    dataset = ISEGLoader(mode="train", classes=2, dataset_path="../iSeg-2017/")
+    dataset = ISEGLoader(mode="train", dataset_path="../iSeg-2017/")
     for i in range(len(dataset)):
         img, mask = dataset[i]
         print(img.shape)

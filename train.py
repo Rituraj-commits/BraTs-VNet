@@ -1,4 +1,6 @@
 from bratsloader import *
+from isegloader import *
+
 from config import *
 from losses import *
 from metrics import *
@@ -27,24 +29,47 @@ def weights_init(m):
 
 
 def main():
-    if(args.model == "unet3d"):
-        print("Using UNet3D")
-        model = Unet3D(c=4, num_classes=3)
-    elif(args.model == "vnet"):
-        print("Using VNet")
-        model = VNet(in_channels=4, classes=3)
-        model.apply(weights_init)
-    elif(args.model == "densevoxelnet"):
-        print("Using DenseVoxelNet")
-        model = DenseVoxelNet(in_channels=4, classes=3)
-    elif(args.model == "fcn"):
-        print("Using FCN")
-        model = FCN_Net(in_channels=4, n_class=3)
-    elif(args.model == "runet"):
-        print("Using ResidualUNet3D")
-        model = ResidualUNet3D(in_channels=4, n_classes=3)
-    else:
-        raise NotImplementedError
+    if(args.dataset == "brats"):
+        print("Using BraTS Dataset")
+        if(args.model == "unet3d"):
+            print("Using UNet3D")
+            model = Unet3D(c=4, num_classes=3)
+        elif(args.model == "vnet"):
+            print("Using VNet")
+            model = VNet(in_channels=4, classes=3)
+            model.apply(weights_init)
+        elif(args.model == "densevoxelnet"):
+            print("Using DenseVoxelNet")
+            model = DenseVoxelNet(in_channels=4, classes=3)
+        elif(args.model == "fcn"):
+            print("Using FCN")
+            model = FCN_Net(in_channels=4, n_class=3)
+        elif(args.model == "runet"):
+            print("Using ResidualUNet3D")
+            model = ResidualUNet3D(in_channels=4, n_classes=3)
+        else:
+            raise NotImplementedError
+
+    elif(args.dataset == "iseg"):
+        print("Using iSeg Dataset")
+        if(args.model == "unet3d"):
+            print("Using UNet3D")
+            model = Unet3D(c=2, num_classes=3)
+        elif(args.model == "vnet"):
+            print("Using VNet")
+            model = VNet(in_channels=2, classes=3)
+            model.apply(weights_init)
+        elif(args.model == "densevoxelnet"):
+            print("Using DenseVoxelNet")
+            model = DenseVoxelNet(in_channels=2, classes=3)
+        elif(args.model == "fcn"):
+            print("Using FCN")
+            model = FCN_Net(in_channels=2, n_class=3)
+        elif(args.model == "runet"):
+            print("Using ResidualUNet3D")
+            model = ResidualUNet3D(in_channels=2, n_classes=3)
+        else:
+            raise NotImplementedError
 
     if(torch.cuda.is_available()):
         print("Using ", torch.cuda.get_device_name(0))
@@ -52,9 +77,16 @@ def main():
     else:
         print("Using CPU")
 
-    train_dataset = BratsDataset(
-        mode="train", crop_dim=args.crop_dim, dataset_path=args.dataset_path
-    )
+    if(args.dataset == "brats"):   
+        print("Loading brats dataset....")  
+        train_dataset = BratsDataset(
+            mode="train", crop_dim=args.crop_dim, dataset_path=args.dataset_path
+        )
+    elif(args.dataset == "iseg"):
+        print("Loading iseg dataset....")
+        train_dataset = ISEGLoader(
+            mode="train", dataset_path=args.dataset_path
+        )
 
     train_loader = torch.utils.data.DataLoader(
         train_dataset,
@@ -80,9 +112,6 @@ def main():
     elif args.loss == "bce":
         print("Using BCE Loss")
         criterion = nn.BCEWithLogitsLoss()
-    elif args.loss == "hausdorff":
-        print("Using Hausdorff Loss")
-        criterion = HausdorffDTLoss()
     else:
         raise NotImplementedError
 
