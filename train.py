@@ -43,7 +43,7 @@ def main():
             model = DenseVoxelNet(in_channels=4, classes=3)
         elif(args.model == "aunet"):
             print("Using Attention UNet")
-            model = AttentionUNet(in_channel=4, num_class=3)
+            model = AttentionUNet3D(c_in=4, c_out=3)
         elif(args.model == "runet"):
             print("Using ResidualUNet3D")
             model = ResidualUNet3D(in_channels=4, n_classes=3)
@@ -64,7 +64,7 @@ def main():
             model = DenseVoxelNet(in_channels=2, classes=3)
         elif(args.model == "aunet"):
             print("Using Attention UNet")
-            model = AttentionUNet(in_channel=2, num_class=3)
+            model = AttentionUNet3D(c_in=2, c_out=3)
         elif(args.model == "runet"):
             print("Using ResidualUNet3D")
             model = ResidualUNet3D(in_channels=2, n_classes=3)
