@@ -42,8 +42,8 @@ def main():
             print("Using DenseVoxelNet")
             model = DenseVoxelNet(in_channels=4, classes=3)
         elif(args.model == "densenet"):
-            print("Using DenseNet3d")
-            model = SinglePathDenseNet(in_channels=4, classes=3, early_fusion=True, return_logits=True, drop_rate=0.1)
+            print("Using SkipDenseNet3d")
+            model = SkipDenseNet3D(in_channels=4, classes=3)
         elif(args.model == "runet"):
             print("Using ResidualUNet3D")
             model = ResidualUNet3D(in_channels=4, n_classes=3)
@@ -63,8 +63,8 @@ def main():
             print("Using DenseVoxelNet")
             model = DenseVoxelNet(in_channels=2, classes=3)
         elif(args.model == "densenet"):
-            print("Using DenseNet3d")
-            model = SinglePathDenseNet(in_channels=4, classes=3, early_fusion=True, return_logits=True, drop_rate=0.1)
+            print("Using SkipDenseNet3d")
+            model = SkipDenseNet3D(in_channels=4, classes=3)
         elif(args.model == "runet"):
             print("Using ResidualUNet3D")
             model = ResidualUNet3D(in_channels=2, n_classes=3)
