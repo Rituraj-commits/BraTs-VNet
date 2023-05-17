@@ -17,5 +17,5 @@ parser.add_argument("-mp", "--ModelPath", type=str, default="../models/unet3d_mo
 parser.add_argument("-c", "--crop_dim", type=tuple, default=(32,128,128))
 parser.add_argument("-vs", "--validation_split", type=float, default=0.2)
 parser.add_argument("-l", "--loss", type=str, default="bce", choices=("dice", "bce","hausdorff"))
-parser.add_argument("-m", "--model", type=str, default="runet", choices=("unet3d", "vnet","densevoxelnet","aunet","runet"))
+parser.add_argument("-m", "--model", type=str, default="runet", choices=("unet3d", "vnet","densevoxelnet","densenet","runet"))
 args = parser.parse_args()
