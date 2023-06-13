@@ -82,6 +82,14 @@ class ConvU(nn.Module):
 class Unet3D(nn.Module):
     def __init__(self, c=4, n=16, dropout=0.5, norm='gn', num_classes=5):
         super(Unet3D, self).__init__()
+        if norm == 'gn':
+            print('Using GroupNorm')
+        elif norm == 'bn':
+            print('Using BatchNorm')
+        elif norm == 'in':
+            print('Using InstanceNorm')
+        else:
+            raise ValueError('normalization type {} is not supported'.format(norm))
         self.upsample = nn.Upsample(scale_factor=2,
                 mode='trilinear', align_corners=False)
 
