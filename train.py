@@ -131,7 +131,7 @@ def main():
             loss = criterion(outputs, labels.float())
             loss.backward()
             optimizer.step()
-            if (i + 1) % 10 == 0:
+            if (i + 1) % 5 == 0:
                 print(
                     "Epoch [%d/%d], Iter [%d/%d] Loss: %.4f"
                     % (epoch + 1, args.epochs, i + 1, len(train_dataset) // args.batch_size, loss.item())
